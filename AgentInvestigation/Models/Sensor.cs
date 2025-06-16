@@ -12,11 +12,31 @@ public class Sensor
     }
 
     //--------------------------------------------------------------
-    public virtual bool Activate(List<Weakness> weaknesses)
+    public void Activate(Agent agent, int position)
     {
         _activationCount++;
-        return weaknesses.Contains(Type);
+        agent.AttachSensorAtPosition(position, this);
     }
 
     public static int GetTotalActivations() => _activationCount;
+}
+
+public class ThermalSensor : Sensor
+{
+    public ThermalSensor() : base(Weakness.Thermal) { }
+}
+
+public class VisualSensor : Sensor
+{
+    public VisualSensor() : base(Weakness.Visual) { }
+}
+
+public class AcousticSensor : Sensor
+{
+    public AcousticSensor() : base(Weakness.Acoustic) { }
+}
+
+public class RadarSensor : Sensor
+{
+    public RadarSensor() : base(Weakness.Radar) { }
 }

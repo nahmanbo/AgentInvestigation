@@ -20,7 +20,7 @@ public class InvestigationManager
 
         while (!_agent.IsExposed())
         {
-            Console.WriteLine($"\nChoose a position to attach the sensor (0 to {0}):", _agent.MaxWeaknesses - 1);
+            Console.WriteLine($"\nChoose a position to attach the sensor (0 to {_agent.MaxWeaknesses - 1}):");
             if (!int.TryParse(Console.ReadLine(), out int position) || position < 0 || position >= _agent.MaxWeaknesses)
             {
                 Console.WriteLine("Invalid position.");
@@ -38,12 +38,21 @@ public class InvestigationManager
             }
 
             Weakness selectedType = _sensorOptions[sensorIndex - 1];
-            Sensor sensor = new Sensor(selectedType);
-            _agent.AttachSensorAtPosition(position, sensor);
+            Sensor sensor = selectedType switch
+            {
+                Weakness.Thermal => new ThermalSensor(),
+                Weakness.Visual => new VisualSensor(),
+                Weakness.Acoustic => new AcousticSensor(),
+                Weakness.Radar => new RadarSensor(),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            sensor.Activate(_agent, position);
 
             int correct = _agent.GetMatchingSensorCount();
             Console.WriteLine($"Result: {correct}/{_agent.MaxWeaknesses} correct.");
-            
+
+            _agent.PrintAgentInfo();
         }
 
         Console.WriteLine("\n✅ Agent exposed successfully!");

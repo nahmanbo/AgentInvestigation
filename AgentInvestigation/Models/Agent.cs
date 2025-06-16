@@ -47,13 +47,23 @@ public abstract class Agent
     //--------------------------------------------------------------
     public int GetMatchingSensorCount()
     {
+        var grouped1 = _weaknesses
+            .GroupBy(x => x)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        var grouped2 = _attachedSensors
+            .Where(s => s != null)
+            .GroupBy(s => s.Type) // כאן התיקון
+            .ToDictionary(g => g.Key, g => g.Count());
+
         int matchCount = 0;
 
-        for (int i = 0; i < MaxWeaknesses; i++)
+        foreach (var kvp in grouped1)
         {
-            Sensor sensor = _attachedSensors[i];
-            if (sensor.Type == _weaknesses[i])
-                matchCount++;
+            if (grouped2.TryGetValue(kvp.Key, out int countInList2))
+            {
+                matchCount += Math.Min(kvp.Value, countInList2);
+            }
         }
 
         return matchCount;
