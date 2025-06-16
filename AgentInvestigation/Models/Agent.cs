@@ -1,16 +1,14 @@
 using AgentInvestigation.Models;
 
-
 public abstract class Agent
 {
     public string Name { get; }
     public string Rank { get; }
     public int MaxWeaknesses { get; }
+    private readonly Weakness[] _weaknesses;
+    private readonly Sensor[] _attachedSensors;
 
-    private readonly List<Weakness> _weaknesses;
-    private List<Sensor> _attachedSensors = new List<Sensor>();
-
-    private static readonly Random _random = new Random();
+    private readonly Random _random = new Random();
 
     //====================================
     protected Agent(string name, string rank, int maxWeaknesses)
@@ -18,36 +16,46 @@ public abstract class Agent
         Name = name;
         Rank = rank;
         MaxWeaknesses = maxWeaknesses;
-        _weaknesses = GenerateRandomWeaknesses();
+        _weaknesses = GenerateRandomWeaknesses(maxWeaknesses);
+        _attachedSensors = new Sensor[MaxWeaknesses];
     }
 
     //--------------------------------------------------------------
-    private List<Weakness> GenerateRandomWeaknesses()
+    private Weakness[] GenerateRandomWeaknesses(int count)
     {
         Array allWeaknesses = Enum.GetValues(typeof(Weakness));
-        List<Weakness> generated = new List<Weakness>();
+        Weakness[] generated = new Weakness[count];
 
-        for (int i = 0; i < MaxWeaknesses; i++)
+        for (int i = 0; i < count; i++)
         {
             int index = _random.Next(allWeaknesses.Length);
-            Weakness selected = (Weakness)allWeaknesses.GetValue(index);
-            generated.Add(selected);
+            generated[i] = (Weakness)allWeaknesses.GetValue(index);
         }
 
         return generated;
     }
 
     //--------------------------------------------------------------
-    public void AttachSensor(Sensor sensor)
+    public void AttachSensorAtPosition(int position, Sensor sensor)
     {
-        _attachedSensors.Add(sensor);
+        if (position >= 0 && position < MaxWeaknesses)
+            _attachedSensors[position] = sensor;
+        else
+            Console.WriteLine($"Invalid position: {position}. Must be between 0 and {MaxWeaknesses - 1}.");
     }
 
     //--------------------------------------------------------------
     public int GetMatchingSensorCount()
     {
         int matchCount = 0;
-        
+
+        for (int i = 0; i < MaxWeaknesses; i++)
+        {
+            Sensor sensor = _attachedSensors[i];
+            if (sensor.Type == _weaknesses[i])
+                matchCount++;
+        }
+
         return matchCount;
     }
 
@@ -56,16 +64,20 @@ public abstract class Agent
     {
         return GetMatchingSensorCount() == MaxWeaknesses;
     }
-
+    
     //--------------------------------------------------------------
-    public List<Weakness> GetWeaknesses()
+    public void PrintAgentInfo()
     {
-        return new List<Weakness>(_weaknesses);
-    }
+        Console.WriteLine($"\nAgent: {Name}, Rank: {Rank}, Weaknesses: {MaxWeaknesses}");
 
-    //--------------------------------------------------------------
-    public List<Sensor> GetAttachedSensors()
-    {
-        return new List<Sensor>(_attachedSensors);
+        Console.Write("Weaknesses: ");
+        for (int i = 0; i < MaxWeaknesses; i++)
+            Console.Write($"{_weaknesses[i]} ");
+
+        Console.Write("\nSensors:    ");
+        for (int i = 0; i < MaxWeaknesses; i++)
+            Console.Write($"{(_attachedSensors[i]?.Type.ToString() ?? "None")} ");
+
+        Console.WriteLine();
     }
 }
