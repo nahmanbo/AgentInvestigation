@@ -12,10 +12,9 @@ public class Sensor
     }
 
     //--------------------------------------------------------------
-    public void Activate(Agent agent, int position)
+    public void Activate()
     {
         _activationCount++;
-        agent.AttachSensorAtPosition(position, this);
     }
 
     public static int GetTotalActivations() => _activationCount;
