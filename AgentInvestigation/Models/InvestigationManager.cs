@@ -45,7 +45,6 @@ public class InvestigationManager
             int correct = agent.GetMatchingSensorCount();
             Console.WriteLine($"Result: {correct}/{agent.MaxWeaknesses} correct.");
 
-            agent.PrintAgentInfo();
         }
     }
 
