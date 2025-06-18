@@ -84,14 +84,7 @@ namespace AgentInvestigation.Models
                 index >= 1 && index <= _sensorOptions.Count)
             {
                 Weakness selected = _sensorOptions[index - 1];
-                return selected switch
-                {
-                    Weakness.Thermal => new ThermalSensor(),
-                    Weakness.Motion => new MotionSensor(),
-                    Weakness.Audio => new AudioSensor(),
-                    Weakness.Pulse => new PulseSensor(),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
+                return SensorFactory.CreateSensor(selected);
             }
 
             Console.WriteLine("Invalid sensor type.");
