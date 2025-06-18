@@ -72,6 +72,9 @@ namespace AgentInvestigation.Models
             Dictionary<Weakness, int> attached = new Dictionary<Weakness, int>();
             foreach (Sensor sensor in _attachedSensors)
             {
+                if (sensor == null)
+                    continue;
+
                 if (attached.ContainsKey(sensor.Type))
                     attached[sensor.Type]++;
                 else
@@ -87,13 +90,17 @@ namespace AgentInvestigation.Models
 
             return matchCount;
         }
-
+        
         //--------------------------------------------------------------
         private void ActivateAllSensors()
         {
             foreach (Sensor sensor in _attachedSensors)
-                sensor.Activate();
+            {
+                if (sensor != null)
+                    sensor.Activate();
+            }
         }
+
 
         //--------------------------------------------------------------
         protected Sensor[] GetInternalSensorArray()
