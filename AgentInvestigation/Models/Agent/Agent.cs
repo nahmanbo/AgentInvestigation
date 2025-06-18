@@ -101,7 +101,6 @@ namespace AgentInvestigation.Models
             }
         }
 
-
         //--------------------------------------------------------------
         protected Sensor[] GetInternalSensorArray()
         {
