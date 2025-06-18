@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace AgentInvestigation.Models
 {
     public static class SensorFactory
