@@ -41,9 +41,7 @@ public class InvestigationManager
             int position = GetSensorPosition(agent);
             Sensor sensor = ChooseSensor();
             agent.AttachSensorAtPosition(position, sensor);
-
-            sensor.Activate();
-
+            
             int correct = agent.GetMatchingSensorCount();
             Console.WriteLine($"Result: {correct}/{agent.MaxWeaknesses} correct.");
 

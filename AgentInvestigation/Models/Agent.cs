@@ -44,16 +44,19 @@ public abstract class Agent
             Console.WriteLine($"Invalid position: {position}. Must be between 0 and {MaxWeaknesses - 1}.");
     }
 
-    //--------------------------------------------------------------
+//--------------------------------------------------------------
     public int GetMatchingSensorCount()
     {
+        foreach (var sensor in _attachedSensors)
+            sensor?.Activate();
+
         var grouped1 = _weaknesses
             .GroupBy(x => x)
             .ToDictionary(g => g.Key, g => g.Count());
 
         var grouped2 = _attachedSensors
             .Where(s => s != null)
-            .GroupBy(s => s.Type) // כאן התיקון
+            .GroupBy(s => s.Type)
             .ToDictionary(g => g.Key, g => g.Count());
 
         int matchCount = 0;
@@ -68,6 +71,7 @@ public abstract class Agent
 
         return matchCount;
     }
+
 
     //--------------------------------------------------------------
     public bool IsExposed()
