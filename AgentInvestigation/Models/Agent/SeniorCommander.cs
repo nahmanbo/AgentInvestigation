@@ -1,7 +1,10 @@
 namespace AgentInvestigation.Models;
 
-public class SeniorCommander: Agent
+public class SeniorCommander : Agent
 {
+    //====================================
     public SeniorCommander(string name)
-        : base(name, "SeniorCommander", 6){}
+        : base(name, "Senior Commander", 5)
+    {
+    }
 }

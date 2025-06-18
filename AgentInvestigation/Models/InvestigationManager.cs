@@ -34,7 +34,7 @@ public class InvestigationManager
     //--------------------------------------------------------------
     private void InvestigateAgent(Agent agent)
     {
-        Console.WriteLine($"The agent's rank is {agent.Rank}, and he has {agent.MaxWeaknesses} weaknesses.");
+        Console.WriteLine($"The agent's rank is {agent.Rank}, and he has {agent.WeaknessesLen} weaknesses.");
 
         while (!agent.IsExposed())
         {
@@ -43,7 +43,7 @@ public class InvestigationManager
             agent.AttachSensorAtPosition(position, sensor);
             
             int correct = agent.GetMatchingSensorCount();
-            Console.WriteLine($"Result: {correct}/{agent.MaxWeaknesses} correct.");
+            Console.WriteLine($"Result: {correct}/{agent.WeaknessesLen} correct.");
 
         }
     }
@@ -53,9 +53,9 @@ public class InvestigationManager
     {
         while (true)
         {
-            Console.WriteLine($"\nChoose a position to attach the sensor (0 to {agent.MaxWeaknesses - 1}):");
+            Console.WriteLine($"\nChoose a position to attach the sensor (0 to {agent.WeaknessesLen - 1}):");
             if (int.TryParse(Console.ReadLine(), out int position) &&
-                position >= 0 && position < agent.MaxWeaknesses)
+                position >= 0 && position < agent.WeaknessesLen)
                 return position;
 
             Console.WriteLine("Invalid position.");

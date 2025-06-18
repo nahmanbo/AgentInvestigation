@@ -1,7 +1,10 @@
 namespace AgentInvestigation.Models;
 
-public class OrganizationLeader:Agent
+public class OrganizationLeader : Agent
 {
+    //====================================
     public OrganizationLeader(string name)
-        : base(name, "OrganizationLeader", 8){}
+        : base(name, "Organization Leader", 6)
+    {
+    }
 }
