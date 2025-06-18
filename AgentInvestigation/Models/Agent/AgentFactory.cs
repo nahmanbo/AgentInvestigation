@@ -1,17 +1,13 @@
 using Models.DBManager;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Models.DBManager;
-
 namespace AgentInvestigation.Models
 {
     public static class IranianAgentFactory
     {
-        private static readonly Random _random = new Random();
         private static readonly Weakness[] AllWeaknesses = (Weakness[])Enum.GetValues(typeof(Weakness));
+        private static readonly Random _random = new Random();
 
+        //--------------------------------------------------------------
         public static Agent CreateAgentById(int id, DabManager db)
         {
             var query = "SELECT Name, Type FROM IranianAgent WHERE Id = @id LIMIT 1";
@@ -46,13 +42,12 @@ namespace AgentInvestigation.Models
         //--------------------------------------------------------------
         private static Weakness[] GenerateRandomWeaknesses(int count)
         {
-            Weakness[] allWeaknesses = (Weakness[])Enum.GetValues(typeof(Weakness));
             Weakness[] generated = new Weakness[count];
 
             for (int i = 0; i < count; i++)
             {
-                int index = _random.Next(allWeaknesses.Length);
-                generated[i] = allWeaknesses[index];
+                int index = _random.Next(AllWeaknesses.Length);
+                generated[i] = AllWeaknesses[index];
             }
 
             return generated;

@@ -1,34 +1,43 @@
+using Models.DBManager;
+
 namespace AgentInvestigation.Models;
 
 public class InvestigationManager
 {
-    private readonly List<Agent> _agents;
+    private readonly DabManager _db;
     private readonly List<Weakness> _sensorOptions;
+    private int _currentAgentId = 1;
 
     //====================================
     public InvestigationManager()
     {
-        _agents = new List<Agent>
-        {
-            new FootSoldier("Iranian Agent #1"),
-            new FootSoldier("Iranian Agent #2"),
-            new SquadLeader("Iranian Agent #3")
-        };
-
+        _db = new DabManager("AgentInvestigation"); 
         _sensorOptions = Enum.GetValues<Weakness>().ToList();
     }
 
     //--------------------------------------------------------------
     public void Start()
     {
-        foreach (var agent in _agents)
+        while (true)
         {
-            Console.WriteLine($"Starting investigation on {agent.Name}");
-            InvestigateAgent(agent);
-            Console.WriteLine($"{agent.Name} exposed!\n");
+            try
+            {
+                var agent = IranianAgentFactory.CreateAgentById(_currentAgentId, _db);
+                Console.WriteLine($"Starting investigation on {agent.Name}");
+                InvestigateAgent(agent);
+                Console.WriteLine($"{agent.Name} exposed!\n");
+
+                _currentAgentId++; // עבור לסוכן הבא
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Finished. {ex.Message}");
+                break;
+            }
         }
 
-        Console.WriteLine("Game over! All Agents ");
+        Console.WriteLine("Game over! All agents investigated.");
+        _db.Close();
     }
 
     //--------------------------------------------------------------
@@ -41,10 +50,9 @@ public class InvestigationManager
             int position = GetSensorPosition(agent);
             Sensor sensor = ChooseSensor();
             agent.AttachSensorAtPosition(position, sensor);
-            
+
             int correct = agent.GetMatchingSensorCount();
             Console.WriteLine($"Result: {correct}/{agent.WeaknessesLen} correct.");
-
         }
     }
 
@@ -74,21 +82,17 @@ public class InvestigationManager
             index >= 1 && index <= _sensorOptions.Count)
         {
             Weakness selected = _sensorOptions[index - 1];
-
-            switch (selected)
+            return selected switch
             {
-                case Weakness.Thermal:
-                    return new ThermalSensor();
-                case Weakness.Visual:
-                    return new VisualSensor();
-                case Weakness.Acoustic:
-                    return new AcousticSensor();
-                case Weakness.Radar:
-                    return new RadarSensor();
-            }
+                Weakness.Thermal => new ThermalSensor(),
+                Weakness.Visual => new VisualSensor(),
+                Weakness.Acoustic => new AcousticSensor(),
+                Weakness.Radar => new RadarSensor(),
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         Console.WriteLine("Invalid sensor type.");
-        return ChooseSensor(); 
+        return ChooseSensor();
     }
 }
