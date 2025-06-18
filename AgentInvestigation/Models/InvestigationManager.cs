@@ -87,9 +87,9 @@ namespace AgentInvestigation.Models
                 return selected switch
                 {
                     Weakness.Thermal => new ThermalSensor(),
-                    Weakness.Visual => new VisualSensor(),
-                    Weakness.Acoustic => new AcousticSensor(),
-                    Weakness.Radar => new RadarSensor(),
+                    Weakness.Motion => new MotionSensor(),
+                    Weakness.Audio => new AudioSensor(),
+                    Weakness.Pulse => new PulseSensor(),
                     _ => throw new ArgumentOutOfRangeException()
                 };
             }

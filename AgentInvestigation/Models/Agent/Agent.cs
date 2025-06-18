@@ -72,7 +72,7 @@ namespace AgentInvestigation.Models
             Dictionary<Weakness, int> attached = new Dictionary<Weakness, int>();
             foreach (Sensor sensor in _attachedSensors)
             {
-                if (sensor == null)
+                if (sensor == null || !sensor.IsUsable)
                     continue;
 
                 if (attached.ContainsKey(sensor.Type))
