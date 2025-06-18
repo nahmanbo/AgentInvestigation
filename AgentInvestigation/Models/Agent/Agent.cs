@@ -6,6 +6,8 @@ namespace AgentInvestigation.Models
         public string Rank { get; }
         public int WeaknessesLen { get; }
 
+        private int _attachedCount;
+
         private readonly Weakness[] _weaknesses;
         private readonly Sensor[] _attachedSensors;
 
@@ -15,6 +17,8 @@ namespace AgentInvestigation.Models
             Name = name;
             Rank = rank;
             WeaknessesLen = weaknessesLen;
+            _attachedCount = 0;
+
             _weaknesses = new Weakness[WeaknessesLen];
             _attachedSensors = new Sensor[WeaknessesLen];
         }
@@ -22,49 +26,27 @@ namespace AgentInvestigation.Models
         //====================================
         public void SetWeaknesses(Weakness[] weaknesses)
         {
-            for (int i = 0; i < WeaknessesLen && i < weaknesses.Length; i++)
-            {
+            if (weaknesses.Length != WeaknessesLen)
+                throw new ArgumentException($"Weaknesses array must be of length {WeaknessesLen}");
+
+            for (int i = 0; i < WeaknessesLen; i++)
                 _weaknesses[i] = weaknesses[i];
-            }
         }
 
         //--------------------------------------------------------------
         public void AttachSensorAtPosition(int position, Sensor sensor)
         {
-            if (position >= 0 && position < WeaknessesLen)
-                _attachedSensors[position] = sensor;
-            else
-                Console.WriteLine($"Invalid position: {position}. Must be between 0 and {WeaknessesLen - 1}.");
+            if (position < 0 || position >= WeaknessesLen)
+                throw new ArgumentOutOfRangeException(nameof(position), $"Must be between 0 and {WeaknessesLen - 1}");
+
+            _attachedSensors[position] = sensor;
+            _attachedCount++;
         }
 
         //--------------------------------------------------------------
-        public void ActivateAllSensors()
+        public int GetAttachedCount()
         {
-            foreach (var sensor in _attachedSensors)
-                sensor?.Activate();
-        }
-
-        //--------------------------------------------------------------
-        public int GetMatchingSensorCount()
-        {
-            var grouped1 = _weaknesses
-                .GroupBy(x => x)
-                .ToDictionary(g => g.Key, g => g.Count());
-
-            var grouped2 = _attachedSensors
-                .Where(s => s != null)
-                .GroupBy(s => s.Type)
-                .ToDictionary(g => g.Key, g => g.Count());
-
-            int matchCount = 0;
-
-            foreach (var kvp in grouped1)
-            {
-                if (grouped2.TryGetValue(kvp.Key, out int countInList2))
-                    matchCount += Math.Min(kvp.Value, countInList2);
-            }
-
-            return matchCount;
+            return _attachedCount;
         }
 
         //--------------------------------------------------------------
@@ -74,9 +56,54 @@ namespace AgentInvestigation.Models
         }
 
         //--------------------------------------------------------------
-        public Sensor[] GetAttachedSensors() => _attachedSensors.ToArray();
+        public int GetMatchingSensorCount()
+        {
+            ActivateAllSensors();
+
+            Dictionary<Weakness, int> required = new Dictionary<Weakness, int>();
+            foreach (Weakness w in _weaknesses)
+            {
+                if (required.ContainsKey(w))
+                    required[w]++;
+                else
+                    required[w] = 1;
+            }
+
+            Dictionary<Weakness, int> attached = new Dictionary<Weakness, int>();
+            foreach (Sensor sensor in _attachedSensors)
+            {
+                if (attached.ContainsKey(sensor.Type))
+                    attached[sensor.Type]++;
+                else
+                    attached[sensor.Type] = 1;
+            }
+
+            int matchCount = 0;
+            foreach (var kvp in required)
+            {
+                if (attached.TryGetValue(kvp.Key, out int attachedCount))
+                    matchCount += Math.Min(kvp.Value, attachedCount);
+            }
+
+            return matchCount;
+        }
 
         //--------------------------------------------------------------
-        public Weakness[] GetWeaknesses() => _weaknesses.ToArray();
+        private void ActivateAllSensors()
+        {
+            foreach (Sensor sensor in _attachedSensors)
+                sensor.Activate();
+        }
+
+        //--------------------------------------------------------------
+        protected Sensor[] GetInternalSensorArray()
+        {
+            return _attachedSensors;
+        }
+
+        //--------------------------------------------------------------
+        public virtual void DetachSensors()
+        {
+        }
     }
 }
